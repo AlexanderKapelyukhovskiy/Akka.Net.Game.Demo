@@ -6,7 +6,7 @@
 <div>
     <h2>Join Game</h2>
     <form>
-        Character name: <input required=""/>
+        Character name: <input required="" />
         <button type="submit">Join Game</button>
     </form>
 </div>
@@ -19,7 +19,24 @@
     <h3>Dead</h3>
 </div>
 
-<div> 
+<div>
     <h2>Other Players</h2>
     TODO list all other players
 </div>
+
+@section Scripts
+{
+    <script language="javascript">
+        document.signalRConnection.on('playerJoined',
+            function(playerName, health) {
+                //todo
+            }
+        );
+
+        document.signalRConnection.on('updatePlayerHealth',
+            function (playerName, health) {
+                //todo
+            }
+        );
+    </script>
+}

@@ -23,3 +23,5 @@ connection.onclose(start);
 
 // Start the connection.
 start();
+
+document.signalRConnection = connection;
