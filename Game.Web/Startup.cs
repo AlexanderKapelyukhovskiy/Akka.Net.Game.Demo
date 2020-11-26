@@ -45,7 +45,7 @@ namespace Game.Web
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHub<ChatHub>("/chathub");
+                endpoints.MapHub<GameHub>("/chathub");
 
                 endpoints.MapControllerRoute(
                     name: "default",
