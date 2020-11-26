@@ -3,25 +3,43 @@
 }
 
 
-<div>
+<div data-bind="visible: !isJoined()">
     <h2>Join Game</h2>
-    <form>
-        Character name: <input required="" />
+    <form data-bind="submit: joinGame">
+        Character name: <input data-bind="value: newPlayerName" required />
         <button type="submit">Join Game</button>
     </form>
 </div>
 
-<div>
-    <h2>todo player name</h2>
+<div data-bind="visible: isJoined()">
+    <h2><span data-bind="text: thisPlayer().playerName"></span></h2>
     <h3>Health</h3>
-    <p>TODO: display health</p>
+    <p><span data-bind="text: thisPlayer().health"></span></p>
 
-    <h3>Dead</h3>
+    <h3  data-bind="visible: !thisPlayer().isAlive()" style="color:red">Dead</h3>
 </div>
 
 <div>
     <h2>Other Players</h2>
-    TODO list all other players
+    
+    <div data-bind="foreach: otherPlayers">
+
+        <hr />
+
+        <p data-bind="text: playerName"></p>
+        <p data-bind="text: health"></p>
+
+        <div data-bind="visible: isAlive() && $parent.thisPlayer().isAlive()">
+            <form data-bind="submit: attack">
+                <button type="submit">Attack</button>
+            </form>
+        </div>
+
+        <h4 data-bind="visible: !isAlive()" style="color: red">
+            Dead
+        </h4>
+
+    </div>
 </div>
 
 @section Scripts
@@ -33,11 +51,11 @@
                 var isMe = playerName === vm.newPlayerName();
 
                 if (isMe) {
-                    vm.thisPlayer.playerName(playerName);
-                    vm.thisPlayer.changeHelth(health);
+                    vm.thisPlayer().playerName(playerName);
+                    vm.thisPlayer().changeHelth(health);
                     vm.isJoined(true);
                 } else {
-                    var playerExistsInList = ko.Utils.arrayFirst(vm.otherPlayers(),
+                    var playerExistsInList = ko.utils.arrayFirst(vm.otherPlayers(),
                         function(player) {
                             return playerName === player.playerName();
                         });
@@ -71,8 +89,8 @@
             var self = this;
 
             self.attack = function() {
-                await document.signalRConnection.invoke("attack", self.playerName());
-            }
+                document.signalRConnection.invoke("attack", self.playerName());
+            };
 
             self.changeHelth = function(newHealth) {
                 self.health(newHealth);
@@ -80,7 +98,7 @@
                 if (newHealth <= 0) {
                     self.isAlive(false);
                 }
-            }
+            };
 
             self.playerName = ko.observable(playerName);
             self.isAlive = ko.observable(true);
@@ -101,7 +119,7 @@
             self.otherPlayers = ko.observableArray();
 
             self.joinGame = function() {
-                await document.signalRConnection.invoke("joinGame", self.newPlayerName());
+                document.signalRConnection.invoke("joinGame", self.newPlayerName());
             }
         }
 

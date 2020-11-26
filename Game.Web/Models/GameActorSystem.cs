@@ -1,6 +1,7 @@
 ﻿using Akka.Actor;
 using Game.ActorModel.Actors;
 using Game.ActorModel.ExternalSystems;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Game.Web.Models
 {
@@ -8,10 +9,16 @@ namespace Game.Web.Models
     {
         private static ActorSystem ActorSystem;
         private static IGameEventsPusher _gameEventsPusher;
+        private static IHubContext<GameHub> _gameHubContext;
+
+        public static void SetGameHub(IHubContext<GameHub> gameHubContext)
+        {
+            _gameHubContext = gameHubContext;
+        }
 
         public static void Create()
         {
-            _gameEventsPusher = new SignalRGameEventPusher();
+            _gameEventsPusher = new SignalRGameEventPusher(_gameHubContext);
 
             ActorSystem = ActorSystem.Create("GameSystem");
 
