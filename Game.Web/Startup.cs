@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Game.Web.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -52,6 +53,20 @@ namespace Game.Web
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            var applicationLifetime = app.ApplicationServices.GetRequiredService<IHostApplicationLifetime>();
+            applicationLifetime.ApplicationStarted.Register(OnStart);
+            applicationLifetime.ApplicationStopping.Register(OnShutdown);
+        }
+
+        private void OnStart()
+        {
+            GameActorSystem.Create();
+        }
+
+        private void OnShutdown()
+        {
+            GameActorSystem.Shutdown();
         }
     }
 }
