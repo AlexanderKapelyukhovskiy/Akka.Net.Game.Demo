@@ -61,5 +61,24 @@
 
             self.changeHelth(health);
         }
+
+        var GameViewModel = function() {
+
+            var self = this;
+
+            self.newPlayerName = ko.observable('');
+            self.isJoined = ko.observable(false);
+
+            self.thisPlayer = ko.observable(new PlayerViewModel('', NaN));
+
+            self.otherPlayers = ko.observableArray();
+
+            self.joinGame = function () {
+                await document.signalRConnection.invoke("joinGame", self.newPlayerName());
+            }
+        }
+
+        var vm = new GameViewModel();
+        ko.applyBindings(vm);
     </script>
 }
