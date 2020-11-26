@@ -29,13 +29,40 @@
     <script language="javascript">
         document.signalRConnection.on('playerJoined',
             function(playerName, health) {
-                //todo
+
+                var isMe = playerName === vm.newPlayerName();
+
+                if (isMe) {
+                    vm.thisPlayer.playerName(playerName);
+                    vm.thisPlayer.changeHelth(health);
+                    vm.isJoined(true);
+                } else {
+                    var playerExistsInList = ko.Utils.arrayFirst(vm.otherPlayers(),
+                        function(player) {
+                            return playerName === player.playerName();
+                        });
+
+                    if (!playerExistsInList) {
+                        vm.otherPlayers.push(new PlayerViewModel(playerName, health));
+                    }
+                }
             }
         );
 
         document.signalRConnection.on('updatePlayerHealth',
             function(playerName, health) {
-                //todo
+
+                var isMe = playerName === vm.newPlayerName();
+
+                if (isMe) {
+                    vm.thisPlayer().changeHelth(health);
+                } else {
+                    vm.otherPlayers().forEach(function(otherPlayer) {
+                        if (otherPlayer.playerName() === playerName) {
+                            otherPlayer.changeHelth(health);
+                        }
+                    });
+                }
             }
         );
 
@@ -73,7 +100,7 @@
 
             self.otherPlayers = ko.observableArray();
 
-            self.joinGame = function () {
+            self.joinGame = function() {
                 await document.signalRConnection.invoke("joinGame", self.newPlayerName());
             }
         }
