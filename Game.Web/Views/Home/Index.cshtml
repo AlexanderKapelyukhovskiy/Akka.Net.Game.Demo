@@ -116,7 +116,8 @@
 
             self.thisPlayer = ko.observable(new PlayerViewModel('', NaN));
 
-            self.otherPlayers = ko.observableArray();
+            self.otherPlayers = ko.observableArray()
+                .extend({ rateLimit: { timeout: 500, method: "notifyWhenChangesStop" } });
 
             self.joinGame = function() {
                 document.signalRConnection.invoke("joinGame", self.newPlayerName());
