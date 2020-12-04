@@ -1,5 +1,6 @@
 ﻿using System;
 using Akka.Actor;
+using Akka.Configuration;
 using Game.ActorModel.Actors;
 using Game.ActorModel.ExternalSystems;
 using Microsoft.AspNetCore.SignalR;
@@ -21,7 +22,32 @@ namespace Game.Web.Models
         {
             _gameEventsPusher = new SignalRGameEventPusher(_gameHubContext);
 
-            ActorSystem = ActorSystem.Create("GameSystem");
+            var config = ConfigurationFactory.ParseString(@"
+            akka {
+          loglevel = OFF
+
+          actor {
+            provider = ""Akka.Remote.RemoteActorRefProvider, Akka.Remote""
+            debug {
+                receive = on
+                autoreceive = on
+                lifecycle = on
+                    event-stream = on
+                unhandled = on
+            }
+        }
+
+        remote {
+            helios.tcp {
+                transport-class = ""Akka.Remote.Transport.Helios.HeliosTcpTransport, Akka.Remote""
+                transport-protocol = tcp
+                port = 0
+                hostname = ""127.0.0.1""
+            }
+        }
+    }");
+
+            ActorSystem = ActorSystem.Create("GameSystem", config);
 
             ActorReferences.GameController = 
                 ActorSystem.ActorSelection("akka.tcp://GameSystem@127.0.0.1:8091/user/GameController")
